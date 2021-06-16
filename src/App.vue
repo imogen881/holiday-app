@@ -1,8 +1,19 @@
 <template>
   <div id="app">
-    <h1 class="header">HOLIDAY</h1>
+    <!-- <div>
+      <Menubar :model="items">
+        <template #start>
+          <img id="logo" alt="logo" src="./assets/plane.png" class="p-mr-2" />
+        </template>
+        <template #end>
+          <InputText placeholder="Search" type="text" v-model="query" v-on:keyup.enter="search" />
+        </template>
+      </Menubar>
+    </div> -->
 
-    <div class="p-grid p-ai-stretch vertical-container">
+    <NavBar />
+
+    <div class="p-grid p-ai-center vertical-container">
       <div class="p-col">
         <Card
           id="card"
@@ -11,15 +22,23 @@
           v-bind:key="holiday.id"
         >
           <template #header>
-            <img v-bind:src="getImage(holiday)" />
+            <img class="cardImage" v-bind:src="getImage(holiday)" />
           </template>
-          <template #title>
-            {{ holiday.name }}
-          </template>
+          <template #title> {{ holiday.name }} </template>m>
           <template #content>
-            {{ holiday.destination }}
-            {{ holiday.country }}
-            {{ holiday.priceGBP }}
+            <div class="cardContent">
+              <strong>{{ holiday.destination }}</strong
+              >, {{ holiday.country }}
+            </div>
+            <div class="cardContent">
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              </p>
+            </div>
+            <div class="cardContent">
+              <strong>£{{ holiday.priceGBP }}pp</strong>
+            </div>
           </template>
           <template #footer>
             <Button
@@ -32,92 +51,127 @@
       </div>
     </div>
 
-    <div ref="bookingForm" v-if="booking === true">
-      <div>
-        <label>Selected package:</label>
-        <Dropdown
-          class="formField"
-          v-model="confirmedHoliday.name"
-          :options="holidays"
-          optionLabel="name"
-          :placeholder="selectedHoliday.name"
-        />
-      </div>
-      <div>
-        <label for="range">Dates:</label>
-        <Calendar
-          class="formField"
-          id="range"
-          v-model="confirmedHoliday.dates"
-          selectionMode="range"
-          :manualInput="false"
-        />
-      </div>
-      <div>
-        <label for="numOfGuests">Number of guests:</label>
-        <InputNumber
-          class="formField"
-          id="numOfGuests"
-          v-model="confirmedHoliday.numOfGuests"
-          showButtons
-          :min="1"
-          :max="10"
-          :placeholder="1"
-        />
-      </div>
+    <div ref="bookingForm" v-if="booking === true && confirmed === false">
+      <h2>Complete your booking below</h2>
+      <div class="p-grid p-jc-center">
+        <div class="p-col-1">
+          <label>Selected package:</label>
+          <Dropdown
+            class="formField"
+            v-model="confirmedHoliday.name"
+            :options="holidays"
+            optionLabel="name"
+            :placeholder="selectedHoliday.name"
+          />
+        </div>
 
-      <div>
-        <p id="subtotal">Subtotal: </p>
-      </div>
+        <div class="p-col">
+          <label for="startDate">Start date:</label>
+          <Calendar
+            id="startDate"
+            v-model="confirmedHoliday.startDate"
+            :showIcon="true"
+          />
 
-      <div>
-        <label for="firstName">First name:</label>
-        <InputText
-          class="formFieldName"
-          id="firstName"
-          v-model="confirmedHoliday.firstName"
-        />
-        <label for="lastName">Last name:</label>
-        <InputText
-          class="formFieldName"
-          id="lastName"
-          v-model="confirmedHoliday.lastName"
-        />
-      </div>
-      <div>
-        <label for="email">Email:</label>
-        <InputText
-          class="formFieldContact"
-          id="email"
-          v-model="confirmedHoliday.email"
-        />
-        <label for="phone">Contact number:</label>
-        <InputText
-          class="formFieldContact"
-          id="phone"
-          v-model="confirmedHoliday.phone"
-        />
-      </div>
+          <label for="endDate">End date:</label>
+          <Calendar
+            id="endDate"
+            v-model="confirmedHoliday.endDate"
+            :showIcon="true"
+          />
+        </div>
 
-      <Button
-        label="Complete booking"
-        id="completeBooking"
-        v-on:click="confirmation()"
-      />
+        <div class="p-col">
+          <label for="numOfGuests">Number of guests:</label>
+          <InputNumber
+            class="formField"
+            id="numOfGuests"
+            v-model="confirmedHoliday.numOfGuests"
+            showButtons
+            :min="1"
+            :max="10"
+            :placeholder="1"
+          />
+        </div>
+
+        <div class="p-col">
+          <h3 id="subtotal" v-bind="subtotal">Subtotal: {{ subtotal }}</h3>
+        </div>
+
+        <h2>Please enter your contact details</h2>
+
+        <div class="p-col">
+          <label for="firstName">First name:</label>
+          <InputText
+            class="formField"
+            id="firstName"
+            v-model="confirmedHoliday.firstName"
+          />
+        </div>
+
+        <div class="p-col">
+          <label for="lastName">Last name:</label>
+          <InputText
+            class="formField"
+            id="lastName"
+            v-model="confirmedHoliday.lastName"
+          />
+        </div>
+
+        <div class="p-col">
+          <label for="email">Email address:</label>
+          <InputText
+            class="formField"
+            id="email"
+            v-model="confirmedHoliday.email"
+          />
+        </div>
+
+        <div class="p-col">
+          <label for="phone">Contact number:</label>
+          <InputNumber
+            :useGrouping="false"
+            class="formField"
+            id="phone"
+            v-model="confirmedHoliday.phone"
+          />
+        </div>
+
+        <Button
+          label="Complete booking"
+          id="completeBooking"
+          v-on:click="confirmation()"
+        />
+      </div>
     </div>
 
-    <div ref="confirmation" v-if="confirmed === true">
-      <h2>BOOKING COMPLETE</h2>
-      <h3>You're going to {{ selectedHoliday.destination }}!</h3>
-      <p>Details will be sent to your email address: {{ confirmedHoliday.email }}</p>
-    </div>
+    <Sidebar
+      id="bookingConfirmation"
+      v-model:visible="visibleFull"
+      :baseZIndex="1000"
+      position="full"
+    >
+      <div id="bookingConfirmationText">
+        <h2>Booking Complete</h2>
+        <h3>You're going to {{ selectedHoliday.destination }}!</h3>
+        <p>Details will be sent to your email address.</p>
+        <p>
+          <img
+            id="bookingConfirmationImage"
+            v-bind:src="getImage(selectedHoliday)"
+          />
+        </p>
+      </div>
+    </Sidebar>
   </div>
 </template>
 
 <script>
+import NavBar from "@/components/navBar";
+
 export default {
   name: "App",
-  components: {},
+  components: { NavBar },
   methods: {
     getImage(holiday) {
       return require("./assets/" + holiday.image + ".jpg");
@@ -125,9 +179,14 @@ export default {
     startBooking(holiday) {
       this.booking = true;
       this.selectedHoliday = holiday;
+      this.subtotal = holiday.priceGBP;
     },
     confirmation() {
       this.confirmed = true;
+      this.visibleFull = true;
+    },
+    calculateSubtotal(numOfGuests) {
+      this.subtotal = this.selectedHoliday.priceGBP * numOfGuests;
     },
   },
   updated() {
@@ -137,14 +196,32 @@ export default {
       window.scrollTo(0, top);
     });
   },
+  watch: {
+    "confirmedHoliday.numOfGuests": {
+      handler(newValue) {
+        this.calculateSubtotal(newValue);
+      },
+    },
+  },
+  computed: {
+    search: function () {
+      return this.holidays.filter((holiday) => {
+        return holiday.name.toLowerCase().includes(this.query.toLowerCase());
+      });
+    },
+  },
   data() {
     return {
       booking: false,
       confirmed: false,
+      visibleFull: false,
       selectedHoliday: undefined,
+      subtotal: 0.0,
+      query: "",
       confirmedHoliday: {
         name: "",
-        dates: "",
+        startDate: "",
+        endDate: "",
         numOfGuests: 1,
         firstName: "",
         lastName: "",
@@ -158,7 +235,7 @@ export default {
           image: "tenerife",
           destination: "Tenerife",
           country: "Spain",
-          priceGBP: "500",
+          priceGBP: 500,
         },
         {
           id: 2,
@@ -166,7 +243,7 @@ export default {
           image: "ny",
           destination: "New York City",
           country: "United States of America",
-          priceGBP: "1200",
+          priceGBP: 1200,
         },
         {
           id: 3,
@@ -174,7 +251,7 @@ export default {
           image: "crete",
           destination: "Crete",
           country: "Greece",
-          priceGBP: "1000",
+          priceGBP: 1000,
         },
         {
           id: 4,
@@ -182,7 +259,7 @@ export default {
           image: "chamonix",
           destination: "Chamonix",
           country: "France",
-          priceGBP: "1500",
+          priceGBP: 1500,
         },
         {
           id: 5,
@@ -190,7 +267,7 @@ export default {
           image: "sardinia",
           destination: "Sardinia",
           country: "Italy",
-          priceGBP: "600",
+          priceGBP: 600,
         },
         {
           id: 6,
@@ -198,7 +275,7 @@ export default {
           image: "capetown",
           destination: "Cape Town",
           country: "South Africa",
-          priceGBP: "1800",
+          priceGBP: 1800,
         },
         {
           id: 7,
@@ -206,7 +283,7 @@ export default {
           image: "paris",
           destination: "Paris",
           country: "France",
-          priceGBP: "300",
+          priceGBP: 300,
         },
         {
           id: 8,
@@ -214,7 +291,7 @@ export default {
           image: "tuscany",
           destination: "Tuscany",
           country: "Italy",
-          priceGBP: "700",
+          priceGBP: 700,
         },
         {
           id: 9,
@@ -222,7 +299,7 @@ export default {
           image: "sydney",
           destination: "Sydney",
           country: "Australia",
-          priceGBP: "2000",
+          priceGBP: 2000,
         },
         {
           id: 10,
@@ -230,7 +307,7 @@ export default {
           image: "rio",
           destination: "Rio de Janeiro",
           country: "Brazil",
-          priceGBP: "1500",
+          priceGBP: 1500,
         },
         {
           id: 11,
@@ -238,7 +315,7 @@ export default {
           image: "rome",
           destination: "Rome",
           country: "Italy",
-          priceGBP: "700",
+          priceGBP: 700,
         },
         {
           id: 12,
@@ -246,7 +323,7 @@ export default {
           image: "nz",
           destination: "Auckland",
           country: "New Zealand",
-          priceGBP: "2000",
+          priceGBP: 2000,
         },
       ],
     };
@@ -273,7 +350,7 @@ p {
   display: inline-block;
 }
 
-img {
+.cardImage {
   float: left;
   height: 250px;
   object-fit: cover;
@@ -282,11 +359,11 @@ img {
 
 .formField {
   width: 50%;
-  margin: 10px;
+  margin: 8px !important;
 }
 
-.formFieldName .formFieldContact {
-  width: 25%;
+input .formField {
+  margin: 15px;
 }
 
 label {
@@ -299,5 +376,30 @@ label {
 
 #subtoal {
   margin: 15px;
+}
+
+.p-field * {
+  display: block;
+}
+
+.cardContent {
+  margin: 10px;
+}
+
+#logo {
+  height: 30px;
+  margin: 10px;
+}
+
+#bookingConfirmationText {
+  text-align: center;
+  margin: 15px;
+}
+
+#bookingConfirmationImage {
+  margin-top: 20px;
+  height: 500px;
+  width: 800px;
+  display: inline-block;
 }
 </style>

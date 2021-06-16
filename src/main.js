@@ -11,6 +11,7 @@ import Calendar from 'primevue/calendar';
 import InputNumber from 'primevue/inputnumber';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import Sidebar from 'primevue/sidebar';
 
 import 'primevue/resources/themes/saga-blue/theme.css'
 import 'primevue/resources/primevue.min.css'
@@ -29,6 +30,7 @@ app.component('Calendar', Calendar)
 app.component('TabView', TabView)
 app.component('TabPanel', TabPanel)
 app.component('InputNumber', InputNumber)
+app.component('Sidebar', Sidebar)
 
 // const app = createApp(App);
 app.mount('#app');

@@ -88,7 +88,7 @@ export default {
 
 <style scoped>
 #logo {
-  height: 30px;
-  margin: 10px;
+  height: 40px;
+  margin: 5px;
 }
 </style>

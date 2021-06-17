@@ -52,7 +52,7 @@
     </div>
 
     <div ref="bookingForm" v-if="booking === true && confirmed === false">
-      <h2 class="formHeaders">Complete your booking below</h2>
+      <h2 class="formHeaders">Complete your package details below</h2>
 
       <div class="p-grid p-jc-center">
         <div class="p-col-1">
@@ -184,6 +184,7 @@ export default {
     },
     confirmation() {
       this.confirmed = true;
+      this.query = "";
       this.visibleFull = true;
     },
     calculateSubtotal(numOfGuests) {
@@ -376,6 +377,8 @@ p {
   background-color: #f8f9fa;
   color: #495057;
   padding: 15px;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
 }
 input .formField {
   margin: 15px;

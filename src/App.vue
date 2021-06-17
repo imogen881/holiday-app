@@ -11,14 +11,14 @@
       </Menubar>
     </div> -->
 
-    <NavBar />
+    <NavBar v-on:searchFunction="searchFunction" />
 
     <div class="p-grid p-ai-center vertical-container">
       <div class="p-col">
         <Card
           id="card"
           style="width: 25rem; margin-bottom: 2em"
-          v-for="holiday in holidays"
+          v-for="holiday in filteredHolidays"
           v-bind:key="holiday.id"
         >
           <template #header>
@@ -52,7 +52,8 @@
     </div>
 
     <div ref="bookingForm" v-if="booking === true && confirmed === false">
-      <h2>Complete your booking below</h2>
+      <h2 class="formHeaders">Complete your booking below</h2>
+
       <div class="p-grid p-jc-center">
         <div class="p-col-1">
           <label>Selected package:</label>
@@ -95,10 +96,10 @@
         </div>
 
         <div class="p-col">
-          <h3 id="subtotal" v-bind="subtotal">Subtotal: {{ subtotal }}</h3>
+          <h3 id="subtotal" v-bind="subtotal">Subtotal: £{{ subtotal }}</h3>
         </div>
 
-        <h2>Please enter your contact details</h2>
+        <h2 class="formHeaders">Please enter your contact details</h2>
 
         <div class="p-col">
           <label for="firstName">First name:</label>
@@ -167,7 +168,7 @@
 </template>
 
 <script>
-import NavBar from "@/components/navBar";
+import NavBar from "@/components/NavBar";
 
 export default {
   name: "App",
@@ -188,6 +189,15 @@ export default {
     calculateSubtotal(numOfGuests) {
       this.subtotal = this.selectedHoliday.priceGBP * numOfGuests;
     },
+    changePackage(holiday) {
+      this.selectedHoliday = holiday;
+      this.confirmedHoliday.numOfGuests = 1;
+      const newPackagePrice = holiday.priceGBP;
+      this.subtotal = newPackagePrice;
+    },
+    searchFunction(query) {
+      this.query = query;
+    },
   },
   updated() {
     this.$nextTick(function () {
@@ -202,9 +212,14 @@ export default {
         this.calculateSubtotal(newValue);
       },
     },
+    "confirmedHoliday.name": {
+      handler(newValue) {
+        this.changePackage(newValue);
+      },
+    },
   },
   computed: {
-    search: function () {
+    filteredHolidays: function () {
       return this.holidays.filter((holiday) => {
         return holiday.name.toLowerCase().includes(this.query.toLowerCase());
       });
@@ -218,6 +233,7 @@ export default {
       selectedHoliday: undefined,
       subtotal: 0.0,
       query: "",
+      searchResult: [],
       confirmedHoliday: {
         name: "",
         startDate: "",
@@ -335,59 +351,49 @@ export default {
 * {
   font-family: "montserrat", sans-serif;
 }
-
 .header {
   padding: 10px 0px;
 }
-
 p {
   line-height: 1.5;
   margin: 0;
 }
-
 #card {
   margin: 10px;
   display: inline-block;
 }
-
 .cardImage {
   float: left;
   height: 250px;
   object-fit: cover;
   margin-bottom: 15px;
 }
-
 .formField {
   width: 50%;
   margin: 8px !important;
 }
-
+.formHeaders {
+  background-color: #f8f9fa;
+  color: #495057;
+  padding: 15px;
+}
 input .formField {
   margin: 15px;
 }
-
 label {
   margin: 15px;
 }
-
 #completeBooking {
   margin: 15px;
 }
-
-#subtoal {
+#subtotal {
   margin: 15px;
+  color: #495057;
 }
-
 .p-field * {
   display: block;
 }
-
 .cardContent {
-  margin: 10px;
-}
-
-#logo {
-  height: 30px;
   margin: 10px;
 }
 
@@ -395,7 +401,6 @@ label {
   text-align: center;
   margin: 15px;
 }
-
 #bookingConfirmationImage {
   margin-top: 20px;
   height: 500px;
